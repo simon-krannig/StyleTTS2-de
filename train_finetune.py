@@ -1,4 +1,3 @@
-# load packages
 import random
 import yaml
 import time
@@ -113,15 +112,20 @@ def main(config_path):
     ASR_config = config.get('ASR_config', False)
     ASR_path = config.get('ASR_path', False)
     text_aligner = load_ASR_models(ASR_path, ASR_config)
-    
+    from speechbrain.pretrained import EncoderDecoderASR
+    asr_model = EncoderDecoderASR.from_hparams(source="jfreiwa/asr-crdnn-german", savedir="pretrained_models/asr-crdnn-german")
+    text_aligner = asr_model
+
     # load pretrained F0 model
     F0_path = config.get('F0_path', False)
     pitch_extractor = load_F0_models(F0_path)
     
     # load PL-BERT model
     BERT_path = config.get('PLBERT_dir', False)
-    plbert = load_plbert(BERT_path)
     
+    from Utils.MLPLBERT.util import load_plbert
+    BERT_path = "Utils/MLPLBERT"
+    plbert = load_plbert(BERT_path)
     # build model
     model_params = recursive_munch(config['model_params'])
     multispeaker = model_params.multispeaker
